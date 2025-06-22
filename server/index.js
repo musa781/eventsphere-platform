@@ -1,9 +1,11 @@
-
-// server/index.js
 require("dotenv").config();
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
+
+const eventRoutes = require("./routes/events");
+const bookingRoutes = require("./routes/bookings");
+
 
 
 const app = express();
@@ -13,19 +15,15 @@ const PORT = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json());
 
-// Simple route
-app.get("/", (req, res) => {
-  res.send("EventSphere backend is running ✅");
-});
+// DB Connect
+mongoose.connect(process.env.MONGO_URI)
+  .then(() => console.log("✅ MongoDB Connected"))
+  .catch((err) => console.error("❌ MongoDB Error:", err));
 
 
-
-mongoose.connect(process.env.MONGODB_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-})
-.then(() => console.log("✅ MongoDB Connected"))
-.catch((err) => console.error("❌ MongoDB Error:", err));
+// API routes
+app.use("/api/events", eventRoutes);
+app.use("/api/bookings", bookingRoutes);
 
 // Start server
 app.listen(PORT, () => {
